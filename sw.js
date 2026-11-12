@@ -3,7 +3,7 @@
  * cross-origin requests (the old handler answered failed font requests with
  * index.html, which broke typography instead of degrading gracefully).
  */
-const CACHE = 'beijing101-v3';
+const CACHE = 'beijing101-v4';
 const ASSETS = [
   './',
   './index.html',

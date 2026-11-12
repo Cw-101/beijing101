@@ -19,7 +19,7 @@
 <section class="view" id="review"><div class="hero"><div><div class="eyebrow">Spaced repetition</div><h1 class="heading">A little recall goes a long way.</h1><div class="sub">Review what you've learned so it sticks. Your queue is stored on this device.</div></div></div><div class="card" style="padding:22px"><div class="section-head" style="margin-top:0"><h3>Today's review queue</h3><span class="tag" id="reviewTag">5 cards due</span></div><div class="vocab-list" id="vocabList"></div><p class="footer-note">V1 uses a simple local review schedule. Full FSRS-5 scheduling is planned for a later release.</p></div></section>
 <section class="view" id="course"><div class="eyebrow">Your syllabus</div><h1 class="heading">30 days to a foundation.</h1><p class="sub">Six phases. Four skills. Two exam milestones.</p><div class="card" style="padding:22px;margin-top:22px" id="courseList"></div></section>
 <section class="view" id="exam"><div class="eyebrow">Knowledge check</div><h1 class="heading">Mini practice paper.</h1><p class="sub">A short, untimed check drawn from the days you have completed.</p><div class="card exam-box" style="margin-top:22px"><div id="examContent"></div></div></section>
-<section class="view" id="settings"><div class="eyebrow">Your learning setup</div><h1 class="heading">Settings</h1><p class="sub">Keep your study routine comfortable and consistent.</p><div class="card" style="padding:22px;margin-top:22px"><div class="settings-row"><span>Daily study target</span><strong>60 minutes</strong></div><div class="settings-row"><span>Audio playback speed</span><select id="speedSelect" class="secondary"><option value="0.8">0.8× beginner</option><option value="1">1.0× normal</option></select></div><div class="settings-row"><span>Show pinyin by default</span><input class="toggle" type="checkbox" id="pinyinToggle" checked></div><div class="settings-row"><span>Browser voice audio</span><span class="small muted">Fallback · zh-CN</span></div><p class="footer-note">This prototype uses your browser's Mandarin speech synthesis when available. It is not a substitute for the human-recorded Beijing audio specified for the full product.</p><button class="secondary" id="resetProgress" style="margin-top:18px;color:var(--red)">Reset local progress</button></div></section>
+<section class="view" id="settings"><div class="eyebrow">Your learning setup</div><h1 class="heading">Settings</h1><p class="sub">Keep your study routine comfortable and consistent.</p><div class="card" style="padding:22px;margin-top:22px"><div class="settings-row"><span>Daily study target</span><strong>60 minutes</strong></div><div class="settings-row"><span>Audio playback speed</span><select id="speedSelect" class="secondary"><option value="0.8">0.8× beginner</option><option value="1">1.0× normal</option></select></div><div class="settings-row"><span>Show pinyin by default</span><input class="toggle" type="checkbox" id="pinyinToggle" checked></div><div class="settings-row"><span>Word audio</span><span class="small muted">Bundled clips · offline</span></div><p class="footer-note">Every word has a bundled Mandarin audio clip, generated with a standard zh-CN neural voice. These are not yet native Beijing speaker recordings.</p><button class="secondary" id="resetProgress" style="margin-top:18px;color:var(--red)">Reset local progress</button></div></section>
 </main></div></div>
 <div class="onboard" id="onboard" role="dialog" aria-modal="true" aria-labelledby="onboardTitle"><div class="modal"><div class="eyebrow">欢迎 · Welcome to Běijīng 101</div><h1 id="onboardTitle">Your Mandarin starts here.</h1><p>A focused 30-day foundation course in Standard Mandarin, with Beijing pronunciation and real-life situations.</p><div class="field"><label for="learnerName">What should we call you?</label><input id="learnerName" placeholder="Your first name" maxlength="24"></div><div class="field"><label>Have you studied Mandarin before?</label><select id="experience" class="secondary"><option value="new">I'm completely new</option><option value="some">I've tried a little</option></select></div><div class="field"><label>Daily study goal</label><input value="60 minutes · Every day" disabled></div><p class="small">30 hours is a foundation, not fluency. We'll build your listening, speaking, reading and writing step by step.</p><div class="modal-actions"><button class="primary" id="finishOnboard">Start my course →</button></div></div></div><div class="toast" id="toast"></div>
 <script src="data/lessons.js"></script>
@@ -234,10 +234,10 @@ function renderBlock() {
           <span class="hanzi">${esc(h)}</span>
           <span class="pinyin">${esc(p)}</span>
           <div class="small muted">${esc(e)}</div>
-          <button aria-label="Play ${esc(p)}" data-say="${esc(p)}">▶</button>
+          <button aria-label="Play ${esc(h)}" data-say="${esc(h)}">▶</button>
         </div>`).join("")}
       </div>
-      <p class="tone-note">These are your browser's Mandarin voice, not recorded Beijing audio.</p>`;
+      <p class="tone-note">Each word ships with a recorded Mandarin clip, so playback works offline.</p>`;
   }
 
   if (i === 3) {
@@ -296,13 +296,35 @@ function renderBlock() {
 
 /* ---------- audio ---------- */
 
+/* Audio: bundled clips in audio/<codepoints>.mp3.
+ * Chrome/Chromium on Linux exposes zero speechSynthesis voices unless
+ * speech-dispatcher has an engine installed, so browser TTS is only a
+ * fallback — the shipped clips are what actually play. */
+let audioEl = null;
+
+function clipPath(text) {
+  const cps = Array.from(String(text)).map((c) => c.codePointAt(0).toString(16));
+  return `audio/${cps.join("-")}.mp3`;
+}
+
 function speak(text) {
-  if (!("speechSynthesis" in window)) { toast("Speech playback is not supported in this browser."); return; }
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = "zh-CN";
-  u.rate = parseFloat(($("speedSelect") && $("speedSelect").value) || 0.8);
-  speechSynthesis.speak(u);
+  if (!audioEl) audioEl = new Audio();
+  const rate = parseFloat(($("speedSelect") && $("speedSelect").value) || 1);
+  audioEl.pause();
+  audioEl.currentTime = 0;
+  audioEl.playbackRate = rate >= 0.8 && rate <= 1 ? rate : 1;
+  audioEl.src = clipPath(text);
+  const played = audioEl.play();
+  if (played && played.catch) {
+    played.catch(() => {
+      if (!("speechSynthesis" in window)) { toast("Audio is unavailable on this device."); return; }
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "zh-CN";
+      u.rate = 0.8;
+      speechSynthesis.speak(u);
+    });
+  }
 }
 
 async function recordPitch() {
@@ -393,7 +415,7 @@ function reviewRow(hanzi) {
       <div><strong>${esc(p)}</strong><small class="meaning" style="display:none">${esc(e)}</small><small>${esc(next)}</small></div>
     </div>
     <div class="vocab-right">
-      <button class="icon-btn" data-say="${esc(p)}" aria-label="Play">▶</button>
+      <button class="icon-btn" data-say="${esc(hanzi)}" aria-label="Play">▶</button>
       <button class="secondary" data-reveal="1">Show</button>
     </div>
     <div class="grade-row">

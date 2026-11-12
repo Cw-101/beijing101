@@ -50,6 +50,13 @@ throwing. A user with old data must never see a dead page.
   if the file genuinely outgrows a single page, say so before splitting it.
 - Test the lesson flow, the review queue, the exam and the settings toggle —
   they each own part of the state object.
+- **Serve with `scripts/serve.py`, never `python -m http.server`.** The stdlib
+  server ignores Range headers and Chrome's media stack then stalls at
+  `readyState 0`, so audio silently never plays locally.
+- Audio is `audio/<codepoints>.mp3`. Add vocabulary, then run
+  `scripts/generate-audio.py` — never hand-name a clip.
+- Don't fall back to `speechSynthesis` as the primary path: Chrome/Chromium on
+  Linux exposes zero voices, so it fails silently for most Linux users.
 
 ## Known limitations (beta)
 

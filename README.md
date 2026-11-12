@@ -2,6 +2,32 @@
 
 A working, local-first browser prototype based on the supplied product brief.
 
+## Audio
+
+Every word ships with a pre-generated Mandarin MP3 in `audio/`, named by the
+hanzi's Unicode code points (`北` → `audio/5317.mp3`), so no lookup table is
+needed. 125 clips, ~1.5 MB total, works offline.
+
+This exists because **browser speech synthesis is unreliable on Linux**: Chrome
+and Chromium expose zero voices unless `speech-dispatcher` has an engine
+installed, so `speechSynthesis.speak()` silently does nothing. Bundled clips
+remove that dependency entirely; TTS remains only as a fallback.
+
+```bash
+scripts/generate-audio.py                      # add clips for new vocabulary
+scripts/generate-audio.py --force --voice zh-CN-YunxiNeural   # regenerate
+```
+
+**Local development must use `scripts/serve.py`, not `python -m http.server`.**
+The stdlib server ignores `Range` headers (it answers 200, not 206), and Chrome's
+media stack stalls at `readyState 0` without byte ranges — audio appears broken
+even though the files are fine. `serve.py` adds Range support so local behaviour
+matches GitHub Pages, which supports it natively.
+
+```bash
+scripts/serve.py 8134
+```
+
 ## Beta v1.1 — what changed
 
 - **All 30 days are authored.** Each day has its own teaching text, vocabulary (148 entries, 210 characters) and a graded check question. Previously days 2-30 replayed Day 1's content under different titles.
