@@ -1,0 +1,192 @@
+/* Běijīng 101 — curriculum data
+ *
+ * One object per day. `words` are the day's vocabulary: [hanzi, pinyin, english].
+ * `quiz` items are [question, [4 options], correctIndex, explanation].
+ *
+ * Pinyin uses tone marks (never numbers). run `scripts/validate-content.py`
+ * before committing any change to this file — it enforces the lexicon and
+ * tone-mark rules the product brief specifies.
+ *
+ * Review/exam days (10, 20, 21, 30) recycle earlier vocabulary deliberately.
+ */
+const LESSONS = [
+  { d: 1, t: "Four tones", can: "hear and produce the four tones",
+    teach: "Mandarin is a tonal language: the same syllable means different things depending on pitch contour. 妈 mā is high and level, 麻 má rises, 马 mǎ dips, 骂 mà falls.",
+    words: [["妈","mā","mother"],["麻","má","hemp"],["马","mǎ","horse"],["骂","mà","to scold"]],
+    quiz: [["Which pinyin is high and level?","mā|má|mǎ|mà",0,"Tone 1 stays high: mā."],
+           ["Which character means horse?","妈|麻|马|骂",2,"马 mǎ means horse."]] },
+
+  { d: 2, t: "Pinyin traps", can: "read pinyin sounds that look unfamiliar",
+    teach: "zh, ch, sh and r are retroflex (tongue curled back); j, q, x sit forward and always take ü written as u. 女 is nǚ, never nu.",
+    words: [["是","shì","to be"],["吃","chī","to eat"],["书","shū","book"],["女","nǚ","female"],["七","qī","seven"]],
+    quiz: [["Which word uses the ü sound?","shì|chī|nǚ|qī",2,"女 nǚ keeps the ü sound, written u after j, q, x."],
+           ["书 means…","book|eat|seven|be",0,"书 shū is book."]] },
+
+  { d: 3, t: "Greetings", can: "greet and thank people naturally",
+    teach: "Greetings are the first thing you will use every day. Note the 不 tone change: 不客气 is bú kèqi, not bù kèqi, because a 4th tone follows.",
+    words: [["你好","nǐ hǎo","hello"],["谢谢","xièxie","thank you"],["不客气","bú kèqi","you are welcome"],["再见","zàijiàn","goodbye"],["哪儿","nǎr","where"]],
+    quiz: [["How do you say thank you?","你好|谢谢|再见|不客气",1,"谢谢 xièxie."],
+           ["再见 means…","hello|thank you|goodbye|where",2,"再见 zàijiàn is goodbye."]] },
+
+  { d: 4, t: "Introduce yourself", can: "give your name and nationality",
+    teach: "叫 jiào is used for names, 是 shì for identity. The pattern is 我叫… / 我是… followed by the name or nationality.",
+    words: [["我","wǒ","I, me"],["叫","jiào","to be called"],["名字","míngzi","name"],["学生","xuésheng","student"],["中国","Zhōngguó","China"]],
+    quiz: [["Which is used to give your name?","是|叫|有|在",1,"叫 jiào: 我叫 Evan."],
+           ["学生 means…","teacher|student|name|China",1,"学生 xuésheng is student."]] },
+
+  { d: 5, t: "Numbers", can: "say and understand numbers 0-99",
+    teach: "0-10 must be memorised; after that numbers are arithmetic. 11 is 十一 (ten-one), 21 is 二十一 (two-ten-one). Before a 4th tone, 一 becomes yí.",
+    words: [["零","líng","zero"],["一","yī","one"],["五","wǔ","five"],["十","shí","ten"],["百","bǎi","hundred"]],
+    quiz: [["How do you say 21?","十二|二十一|一十二|二十",1,"二十一: two-ten-one."],
+           ["十 means…","five|zero|ten|hundred",2,"十 shí is ten."]] },
+
+  { d: 6, t: "Question machines", can: "ask and answer five question types",
+    teach: "Word order does not change to ask a question. Add 吗 ma for yes/no, or swap in a question word: 什么 what, 谁 who, 哪 which, 怎么 how.",
+    words: [["吗","ma","question particle"],["什么","shénme","what"],["谁","shéi","who"],["哪","nǎ","which"],["怎么","zěnme","how"]],
+    quiz: [["Which particle makes a yes/no question?","吗|呢|吧|啊",0,"吗 ma at the end."],
+           ["谁 asks…","what|who|how|which",1,"谁 shéi is who."]] },
+
+  { d: 7, t: "Identity+", can: "give a 30-second self-introduction",
+    teach: "Combine the pieces: 姓 surname, 今年 this year, 岁 years old, 住 live, 来自 come from. 姓 xìng takes the family name only.",
+    words: [["姓","xìng","surname"],["岁","suì","years old"],["住","zhù","to live"],["来自","láizì","to come from"],["今年","jīnnián","this year"]],
+    quiz: [["Which word asks about your surname?","岁|住|姓|今年",2,"姓 xìng is surname."],
+           ["岁 is used for…","age|name|city|year",0,"岁 suì counts years of age."]] },
+
+  { d: 8, t: "First characters: Beijing places", can: "recognise your first 15 characters",
+    teach: "Place names are your anchor for reading. 天安门 is Tiān'ānmén — the apostrophe separates syllables so it is not read as tian an men.",
+    words: [["北京","Běijīng","Beijing"],["天安门","Tiān'ānmén","Tiananmen"],["地铁","dìtiě","subway"],["大学","dàxué","university"],["商店","shāngdiàn","shop"]],
+    quiz: [["地铁 means…","shop|subway|university|Beijing",1,"地铁 dìtiě is subway."],
+           ["Which is a shop?","大学|商店|地铁|北京",1,"商店 shāngdiàn."]] },
+
+  { d: 9, t: "Money & shopping", can: "buy something under ¥50",
+    teach: "多少钱 duōshao qián asks the price. 块 kuài is the spoken word for yuan. 太贵了 tài guì le means too expensive.",
+    words: [["多少钱","duōshao qián","how much money"],["块","kuài","yuan (spoken)"],["贵","guì","expensive"],["便宜","piányi","cheap"],["买","mǎi","to buy"]],
+    quiz: [["How do you ask the price?","多少钱|什么钱|几钱|哪钱",0,"多少钱 duōshao qián."],
+           ["便宜 means…","expensive|cheap|buy|money",1,"便宜 piányi is cheap."]] },
+
+  { d: 10, t: "Review + Mini Test 1", can: "check your survival Mandarin",
+    teach: "No new vocabulary today. Recall tones, greetings, numbers and prices, then take the practice check.",
+    words: [["你好","nǐ hǎo","hello"],["谢谢","xièxie","thank you"],["十","shí","ten"],["贵","guì","expensive"],["北京","Běijīng","Beijing"]],
+    quiz: [["Which tone is falling?","mā|má|mǎ|mà",3,"Tone 4 falls: mà."],
+           ["Which is a greeting?","块|你好|地铁|贵",1,"你好 nǐ hǎo."]] },
+
+  { d: 11, t: "Food & ordering", can: "order a meal",
+    teach: "点菜 diǎncài is to order dishes, 菜单 càidān the menu. 米饭 is rice, 面条 noodles — note miàntiáo, one word.",
+    words: [["米饭","mǐfàn","cooked rice"],["面条","miàntiáo","noodles"],["水","shuǐ","water"],["菜单","càidān","menu"],["点菜","diǎncài","to order food"]],
+    quiz: [["面条 means…","rice|noodles|water|menu",1,"面条 miàntiáo."],
+           ["What is 水?","water|rice|menu|noodles",0,"水 shuǐ is water."]] },
+
+  { d: 12, t: "Dietary needs", can: "explain what you eat and ask ingredients",
+    teach: "素 sù means vegetarian, 辣 là spicy, 肉 ròu meat. 不要 búyào means I do not want — again 不 shifts to bú before a 4th tone.",
+    words: [["素","sù","vegetarian"],["辣","là","spicy"],["不要","búyào","do not want"],["肉","ròu","meat"],["过敏","guòmǐn","allergic"]],
+    quiz: [["Which word means spicy?","素|辣|肉|水",1,"辣 là."],
+           ["过敏 means…","spicy|vegetarian|allergic|meat",2,"过敏 guòmǐn is allergic."]] },
+
+  { d: 13, t: "Restaurant roleplay", can: "follow a restaurant interaction",
+    teach: "服务员 fúwùyuán is the waiter, 买单 mǎidān the bill. 好吃 hǎochī praises the food; 还要 hái yào asks for more.",
+    words: [["服务员","fúwùyuán","waiter"],["买单","mǎidān","the bill"],["还要","hái yào","also want"],["好吃","hǎochī","tasty"]],
+    quiz: [["How do you ask for the bill?","点菜|买单|还要|好吃",1,"买单 mǎidān."],
+           ["好吃 describes…","price|taste|time|place",1,"好吃 hǎochī means tasty."]] },
+
+  { d: 14, t: "Clock time", can: "ask and tell the time",
+    teach: "点 diǎn marks the hour, 分 fēn the minutes, 半 bàn half past. 现在几点 jǐ diǎn asks the time.",
+    words: [["点","diǎn","o'clock"],["分","fēn","minute"],["现在","xiànzài","now"],["几点","jǐ diǎn","what time"],["半","bàn","half"]],
+    quiz: [["半 means…","hour|half|minute|now",1,"半 bàn is half."],
+           ["Which asks the time?","几点|多少钱|哪儿|什么",0,"几点 jǐ diǎn."]] },
+
+  { d: 15, t: "Dates & days", can: "say the date and the day",
+    teach: "Dates run large to small: 月 yuè then 号 hào. 星期 xīngqī plus a number gives the weekday; 今天 today, 明天 tomorrow.",
+    words: [["今天","jīntiān","today"],["明天","míngtiān","tomorrow"],["星期","xīngqī","week"],["月","yuè","month"],["号","hào","day of month"]],
+    quiz: [["明天 means…","today|tomorrow|week|month",1,"明天 míngtiān."],
+           ["Which word means month?","号|月|星期|今天",1,"月 yuè."]] },
+
+  { d: 16, t: "Transport", can: "navigate Beijing transit",
+    teach: "地铁 dìtiě is the subway, 公交车 gōngjiāochē the bus, 打车 dǎchē to take a taxi. 票 piào is a ticket, 站 zhàn a stop.",
+    words: [["地铁","dìtiě","subway"],["公交车","gōngjiāochē","bus"],["票","piào","ticket"],["站","zhàn","station, stop"],["打车","dǎchē","to take a taxi"]],
+    quiz: [["打车 means…","take the bus|take a taxi|buy a ticket|walk",1,"打车 dǎchē."],
+           ["站 is a…","ticket|stop|taxi|line",1,"站 zhàn is a stop or station."]] },
+
+  { d: 17, t: "Directions", can: "ask for and follow directions",
+    teach: "左 zuǒ left, 右 yòu right, 前 qián ahead, 后 hòu behind. 一直走 yìzhí zǒu means go straight — 一 is yì before a 2nd tone.",
+    words: [["左","zuǒ","left"],["右","yòu","right"],["前","qián","front, ahead"],["后","hòu","behind"],["一直走","yìzhí zǒu","go straight"]],
+    quiz: [["Which is right?","左|右|前|后",1,"右 yòu."],
+           ["一直走 means…","turn left|go straight|stop|go back",1,"一直走 yìzhí zǒu."]] },
+
+  { d: 18, t: "Home & family", can: "describe your family",
+    teach: "Family words are built by doubling: 爸爸 father, 妈妈 mother, 哥哥 older brother, 姐姐 older sister. 家 jiā is home or family.",
+    words: [["家","jiā","home, family"],["爸爸","bàba","father"],["妈妈","māma","mother"],["哥哥","gēge","older brother"],["姐姐","jiějie","older sister"]],
+    quiz: [["妈妈 is…","father|mother|brother|sister",1,"妈妈 māma."],
+           ["家 means…","house only|home or family|city|room",1,"家 jiā covers home and family."]] },
+
+  { d: 19, t: "Weather", can: "make simple weather small talk",
+    teach: "天气 tiānqì is weather, 热 rè hot, 冷 lěng cold, 雨 yǔ rain, 晴 qíng clear. Weather talk is the easiest way to start a conversation.",
+    words: [["天气","tiānqì","weather"],["热","rè","hot"],["冷","lěng","cold"],["雨","yǔ","rain"],["晴","qíng","clear, sunny"]],
+    quiz: [["Which word means cold?","热|冷|雨|晴",1,"冷 lěng."],
+           ["天气 means…","weather|water|sun|wind",0,"天气 tiānqì."]] },
+
+  { d: 20, t: "Mock Exam 1", can: "check your foundation so far",
+    teach: "A checkpoint, not a lesson. Revise days 1-19, then take the practice paper in the exam tab.",
+    words: [["学生","xuésheng","student"],["多少钱","duōshao qián","how much"],["天气","tiānqì","weather"],["左","zuǒ","left"],["米饭","mǐfàn","rice"]],
+    quiz: [["Which asks how much?","几点|多少钱|什么|哪儿",1,"多少钱 duōshao qián."],
+           ["Which is a family word?","妈妈|地铁|米饭|天气",0,"妈妈 māma."]] },
+
+  { d: 21, t: "Remediation", can: "strengthen your three weakest areas",
+    teach: "Use the review queue today and nothing else. Whatever comes back wrong most often is what to study tomorrow.",
+    words: [["谢谢","xièxie","thank you"],["面条","miàntiáo","noodles"],["星期","xīngqī","week"],["便宜","piányi","cheap"],["冷","lěng","cold"]],
+    quiz: [["Which means cheap?","贵|便宜|热|冷",1,"便宜 piányi."],
+           ["面条 is a…","place|food|time|person",1,"面条 miàntiáo is food."]] },
+
+  { d: 22, t: "Hobbies", can: "talk about your free time",
+    teach: "喜欢 xǐhuan puts the verb after it: 我喜欢看书. 音乐 music, 运动 sport, 电影 film.",
+    words: [["喜欢","xǐhuan","to like"],["看书","kàn shū","to read"],["音乐","yīnyuè","music"],["运动","yùndòng","exercise, sport"],["电影","diànyǐng","film"]],
+    quiz: [["喜欢 means…","to have|to like|to go|to see",1,"喜欢 xǐhuan."],
+           ["电影 is…","music|sport|film|book",2,"电影 diànyǐng."]] },
+
+  { d: 23, t: "Study & work", can: "say what you do",
+    teach: "学习 xuéxí to study, 工作 gōngzuò work or a job, 专业 zhuānyè your major. 医生 doctor, 老师 teacher.",
+    words: [["学习","xuéxí","to study"],["工作","gōngzuò","work, job"],["专业","zhuānyè","major, field"],["医生","yīshēng","doctor"],["老师","lǎoshī","teacher"]],
+    quiz: [["工作 means…","study|work|major|teacher",1,"工作 gōngzuò."],
+           ["专业 is your…","job|major|name|home",1,"专业 zhuānyè."]] },
+
+  { d: 24, t: "Ability & desire", can: "express wants and ability",
+    teach: "会 huì is learned ability, 能 néng is physical possibility, 想 xiǎng is want, 可以 kěyǐ is permission. They are not interchangeable.",
+    words: [["会","huì","can (learned)"],["能","néng","can (able to)"],["想","xiǎng","to want"],["要","yào","to need, want"],["可以","kěyǐ","may, allowed"]],
+    quiz: [["Which one is permission?","会|能|想|可以",3,"可以 kěyǐ."],
+           ["会 describes…","learned ability|permission|desire|need",0,"会 huì is a learned skill."]] },
+
+  { d: 25, t: "Past & experience", can: "talk about simple past experiences",
+    teach: "了 le marks a completed action, 过 guo marks experience at some point. 以前 yǐqián before, 昨天 zuótiān yesterday.",
+    words: [["了","le","completed action"],["过","guo","have experienced"],["以前","yǐqián","before"],["昨天","zuótiān","yesterday"],["已经","yǐjīng","already"]],
+    quiz: [["Which marks past experience?","了|过|着|的",1,"过 guo: 我去过北京."],
+           ["昨天 means…","today|tomorrow|yesterday|before",2,"昨天 zuótiān."]] },
+
+  { d: 26, t: "Plans", can: "talk about what you will do",
+    teach: "Future needs no special tense: 明天我去 works. 打算 dǎsuàn is to plan, 明年 míngnián next year, 以后 yǐhòu afterwards.",
+    words: [["打算","dǎsuàn","to plan"],["明年","míngnián","next year"],["以后","yǐhòu","after, later"],["会","huì","will"],["要","yào","going to"]],
+    quiz: [["打算 means…","to plan|to go|to want|to finish",0,"打算 dǎsuàn."],
+           ["明年 is…","this year|next year|last year|today",1,"明年 míngnián."]] },
+
+  { d: 27, t: "Beijing life + erhua", can: "read a short Beijing text",
+    teach: "Beijing speech adds 儿 to many words: 这儿 here, 那儿 there, 一点儿 a little, 玩儿 to play. 胡同 hútòng are the old lanes.",
+    words: [["这儿","zhèr","here"],["那儿","nàr","there"],["一点儿","yìdiǎnr","a little"],["玩儿","wánr","to play"],["胡同","hútòng","alley, hutong"]],
+    quiz: [["这儿 means…","here|there|where|everywhere",0,"这儿 zhèr."],
+           ["胡同 is an…","alley|apartment|shop|park",0,"胡同 hútòng."]] },
+
+  { d: 28, t: "Joining ideas", can: "write a short connected paragraph",
+    teach: "Connectives carry your argument: 因为 because, 所以 therefore, 但是 but, 而且 moreover, 虽然 although. Pair 因为 with 所以 and 虽然 with 但是.",
+    words: [["因为","yīnwèi","because"],["所以","suǒyǐ","therefore"],["但是","dànshì","but"],["而且","érqiě","moreover"],["虽然","suīrán","although"]],
+    quiz: [["Which pairs with 因为?","但是|所以|而且|虽然",1,"因为…所以… because…therefore."],
+           ["虽然 pairs with…","所以|但是|而且|因为",1,"虽然…但是… although…but."]] },
+
+  { d: 29, t: "Speaking intensive", can: "complete three recorded roleplays",
+    teach: "Politeness markers smooth every interaction: 请问 may I ask, 麻烦你 sorry to trouble you, 对不起 sorry, 没关系 it does not matter.",
+    words: [["请问","qǐngwèn","may I ask"],["麻烦你","máfan nǐ","sorry to trouble you"],["对不起","duìbuqǐ","sorry"],["没关系","méi guānxi","it does not matter"],["太好了","tài hǎo le","great"]],
+    quiz: [["Which opens a polite question?","对不起|请问|没关系|太好了",1,"请问 qǐngwèn."],
+           ["没关系 answers…","thank you|an apology|a greeting|a price",1,"没关系 replies to 对不起."]] },
+
+  { d: 30, t: "Mock Exam 2 + graduation", can: "review your progress and next steps",
+    teach: "Final checkpoint. Take the practice paper, then look back at day 1 — you can now hear tones, order food, ask directions and connect sentences.",
+    words: [["喜欢","xǐhuan","to like"],["工作","gōngzuò","work"],["因为","yīnwèi","because"],["胡同","hútòng","alley"],["请问","qǐngwèn","may I ask"]],
+    quiz: [["Which connective means because?","所以|因为|但是|而且",1,"因为 yīnwèi."],
+           ["请问 is used to…","apologise|ask politely|thank|greet",1,"请问 qǐngwèn opens a polite question."]] },
+];

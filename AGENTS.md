@@ -51,9 +51,11 @@ throwing. A user with old data must never see a dead page.
 - Test the lesson flow, the review queue, the exam and the settings toggle —
   they each own part of the state object.
 
-## Known limitations (V1)
+## Known limitations (beta)
 
-- Only Day 1 lesson content is authored. Days 2-30 show the same six blocks
-  under different titles — the syllabus is real, the per-day content is not.
-- Browser `zh-CN` speech synthesis is the audio, not recorded Beijing speakers.
-- No FSRS scheduling; the review queue is a simple local list.
+- The scheduler is SM-2 style, not FSRS-5.
+- Audio is browser `zh-CN` speech synthesis, not recorded Beijing speakers.
+- Pitch "scoring" only confirms the microphone is receiving input.
+- Content is 30 authored days (148 entries). Tone marks are validated
+  structurally and cross-checked against `pypinyin`; a human still owns the
+  final call on teaching quality.

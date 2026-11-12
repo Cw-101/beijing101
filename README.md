@@ -2,6 +2,21 @@
 
 A working, local-first browser prototype based on the supplied product brief.
 
+## Beta v1.1 — what changed
+
+- **All 30 days are authored.** Each day has its own teaching text, vocabulary (148 entries, 210 characters) and a graded check question. Previously days 2-30 replayed Day 1's content under different titles.
+- **Real spaced repetition.** SM-2 style scheduling (`cards` map: interval, ease, due date) replaces the flat "reviewed" list. Grade a card Again / Hard / Good / Easy and the next due date moves accordingly; the dashboard queue and review tag both read from the same schedule.
+- **Exam draws from your progress.** Questions come from the days you have actually completed, shuffled, capped at 10, with per-question explanations and a stored best score. Before, it was four hardcoded Day 1 questions that never changed.
+- **Content validation pipeline.** `scripts/validate-content.py` enforces the lexicon and tone-mark rules: 30 days, ≥4 words each, CJK-only hanzi, no tone numbers, tone marks never exceeding character count, 4 options per quiz item. With `pypinyin` available it also cross-checks every entry's syllables against a real reading of the hanzi.
+- **Publish tooling.** `scripts/deploy-gh-pages.sh` validates, pushes and enables GitHub Pages. Service worker bumped to v3 and now precaches the curriculum data.
+
+Run the validator before every commit that touches content:
+
+```bash
+python3 scripts/validate-content.py
+uv run --with pypinyin python scripts/validate-content.py   # with syllable cross-check
+```
+
 ## Run it
 
 - Simplest: open `index.html` in a modern browser.
@@ -34,6 +49,6 @@ Bugs found by exercising the running app, and what changed:
 
 ## Not implemented yet
 
-This is a front-end V1 prototype, not the complete production architecture. It does not yet include all 30 authored lessons/exercises, native Beijing speaker recordings, FSRS-5, reliable pitch-contour scoring, Azure pronunciation assessment, handwriting/stroke animation, timed four-paper mock exams, exam grade calibration, sync/database abstraction, or Tauri Windows/Linux packaging. The voice feature uses the browser's installed `zh-CN` voice when available and may require internet or OS voice assets.
+This is a front-end beta, not the complete production architecture. Still outstanding: native Beijing speaker recordings, FSRS-5 (the scheduler is SM-2 style), reliable pitch-contour scoring, Azure pronunciation assessment, handwriting/stroke animation, timed four-paper mock exams, exam grade calibration, sync/database abstraction, and Tauri Windows/Linux packaging. The voice feature uses the browser's installed `zh-CN` voice when available and may require internet or OS voice assets.
 
-The Chinese content shown is limited to items present in the supplied brief (plus the brief's four-tone teaching examples). Production content should go through the specified lexicon and tone-mark validation pipeline.
+The Chinese content now covers all 30 days (148 entries, 210 characters) and must pass `scripts/validate-content.py` before it ships. Production content should still go through the fuller lexicon review the brief specifies.
