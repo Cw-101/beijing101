@@ -1,1 +1,18 @@
-{"name":"Běijīng 101 — Mandarin Foundation","short_name":"Běijīng 101","start_url":"./","display":"standalone","background_color":"#faf7f2","theme_color":"#faf7f2","description":"A 30-day Beijing Mandarin foundation course.","icons":[]}
+{
+  "name": "Běijīng 101 — Mandarin Foundation",
+  "short_name": "Běijīng 101",
+  "description": "A 30-day Beijing Mandarin foundation course.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#faf7f2",
+  "theme_color": "#faf7f2",
+  "lang": "en",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

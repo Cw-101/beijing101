@@ -5,7 +5,20 @@ A working, local-first browser prototype based on the supplied product brief.
 ## Run it
 
 - Simplest: open `index.html` in a modern browser.
-- For installable PWA/offline service-worker support, serve this folder from localhost (for example `python -m http.server 8000`) and open `http://localhost:8000`.
+- For installable PWA/offline service-worker support, serve this folder from localhost (for example `python -m http.server 8134`) and open `http://127.0.0.1:8134`.
+
+## Fixed in review — 2026-11-12
+
+Bugs found by exercising the running app, and what changed:
+
+- **Corrupt saved progress killed the app.** `JSON.parse` on the `bj101` key ran without a guard, so a malformed value threw during startup and left a page with no event handlers. Now `loadState()` resets bad data, merges over `DEFAULTS`, and validates every field.
+- **PWA was not installable.** `manifest.webmanifest` shipped `"icons": []`. Added generated 192px and 512px PNGs (maskable) plus `apple-touch-icon`.
+- **Review counter was hardcoded to 5** while the queue holds 8 cards, so it hit zero with cards still left. Now derived from `vocab.length`.
+- **"Today's study time" never reset and capped at 60 forever.** Now tracks `dayMinutes` + `lastStudyDate` and shows today's work only.
+- **Streak pill read "1 day learning" before any lesson existed.** Now shows "Not started yet".
+- **The pinyin toggle did nothing** — it only fired a toast. Now hides/shows pinyin and persists the choice.
+- **Completing day 30 could roll the day counter past the course.** Now clamps and reports course completion.
+- **Service worker answered failed cross-origin requests with `index.html`**, breaking font loads; it also never refreshed the page for returning users. Now network-first for navigations, cache-first for same-origin assets only, and `CACHE` is versioned.
 
 ## Included in V1
 
