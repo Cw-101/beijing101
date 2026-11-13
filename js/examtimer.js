@@ -41,6 +41,10 @@ document.addEventListener('DOMContentLoaded', function() {
         totalSeconds = 0;
         timerElement.textContent = 'Time: 0:00';
         stopTimer();
+        // Clear interval on visibilitychange
+        if (document.visibilityState === 'hidden') {
+          clearInterval(timerInterval);
+        }
       }
     });
 
