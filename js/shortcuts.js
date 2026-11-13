@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Handle space key to play the word
-    if (event.key === ' ') {
+    if (event.key === ' ' && !document.getElementById('onboard')?.classList?.contains('show') && !document.getElementById('keyhelp')?.classList?.contains('show')) {
       const playWordButton = document.getElementById('playWord');
       if (playWordButton) {
         event.preventDefault(); // Prevent default scrolling behavior

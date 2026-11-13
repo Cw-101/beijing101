@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.classList.add('night');
   }
 
+  // Reflect stored value on load
   if (document.getElementById('settings')) {
     const settingsRow = document.createElement('div');
     settingsRow.className = 'settings-row';
@@ -13,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.className = 'toggle';
+    checkbox.checked = localStorage.getItem('bj101night') === '1';
     checkbox.addEventListener('change', function() {
       if (this.checked) {
         document.body.classList.add('night');
@@ -31,5 +33,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Define the night mode style
 const style = document.createElement('style');
-style.textContent = 'body.night { filter: invert(1) hue-rotate(180deg); } body.night img { filter: none; }';
+style.textContent = 'body.night { filter: invert(1) hue-rotate(180deg); } body.night img { filter: none; } @media print { body.night { filter: none; } }';
 document.head.appendChild(style);

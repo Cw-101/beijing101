@@ -6,8 +6,11 @@ document.addEventListener('DOMContentLoaded', function() {
     searchInput.placeholder = 'Search words…';
     vocabList.parentNode.insertBefore(searchInput, vocabList);
 
+    let searchValue = '';
+    searchInput.value = searchValue;
     searchInput.addEventListener('input', function() {
-      const searchTerm = this.value.trim().toLowerCase();
+      searchValue = this.value;
+      const searchTerm = searchValue.trim().toLowerCase();
       if (searchTerm === '') {
         vocabList.childNodes.forEach(function(item) {
           item.style.display = '';
@@ -20,6 +23,13 @@ document.addEventListener('DOMContentLoaded', function() {
             item.style.display = 'none';
           }
         });
+      }
+    });
+
+    vocabList.addEventListener('DOMNodeInserted', function() {
+      if (vocabList.childNodes.length === 0) {
+        searchInput.disabled = true;
+        searchInput.style.display = 'none';
       }
     });
   }

@@ -46,7 +46,15 @@ document.addEventListener('DOMContentLoaded', () => {
           const reader = new FileReader();
           reader.onload = (event) => {
             const parsed = JSON.parse(event.target.result);
-            if (parsed.app !== 'beijing101' || !parsed.state || typeof parsed.state !== 'object') {
+            if (parsed.app !== 'beijing101' || !parsed.state || (typeof parsed.state === 'object' && (!parsed.state.name || !parsed.state.day || !parsed.state.completed || !parsed.state.cards))) {
+              showToast('That is not a beijing-101 backup');
+              return;
+            }
+            if (Array.isArray(parsed.state)) {
+              showToast('That is not a beijing-101 backup');
+              return;
+            }
+            if (typeof parsed.state === 'object' && (!Object.hasOwn(parsed.state, 'name') || !Object.hasOwn(parsed.state, 'day') || !Object.hasOwn(parsed.state, 'completed') || !Object.hasOwn(parsed.state, 'cards'))) {
               showToast('That is not a beijing-101 backup');
               return;
             }
@@ -119,7 +127,17 @@ window.importProgress = (file) => {
     reader.onload = (event) => {
       try {
         const parsed = JSON.parse(event.target.result);
-        if (parsed.app !== 'beijing101' || !parsed.state || typeof parsed.state !== 'object') {
+        if (parsed.app !== 'beijing101' || !parsed.state || (typeof parsed.state === 'object' && (!parsed.state.name || !parsed.state.day || !parsed.state.completed || !parsed.state.cards))) {
+          showToast('That is not a beijing-101 backup');
+          reject();
+          return;
+        }
+        if (Array.isArray(parsed.state)) {
+          showToast('That is not a beijing-101 backup');
+          reject();
+          return;
+        }
+        if (typeof parsed.state === 'object' && (!Object.hasOwn(parsed.state, 'name') || !Object.hasOwn(parsed.state, 'day') || !Object.hasOwn(parsed.state, 'completed') || !Object.hasOwn(parsed.state, 'cards'))) {
           showToast('That is not a beijing-101 backup');
           reject();
           return;
