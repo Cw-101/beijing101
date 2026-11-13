@@ -264,7 +264,22 @@ function renderBlock() {
           <button aria-label="Play ${esc(h)}" data-say="${esc(h)}">▶</button>
         </div>`).join("")}
       </div>
-      <p class="tone-note">Each word ships with a recorded Mandarin clip, so playback works offline.</p>`;
+      <p class="tone-note">Each word ships with a recorded Mandarin clip, so playback works offline.</p>
+      ${(lesson.ex || []).length ? `<div class="section-head"><h3>Sentences</h3></div>
+      <p class="instruction">Hear it in context, then say it back.</p>
+      <div class="vocab-list">${lesson.ex.map((s) => `
+        <div class="vocab-item">
+          <div class="vocab-left">
+            <div>
+              <strong class="hanzi" style="font-size:22px">${esc(s.h)}</strong>
+              <small class="pinyin">${esc(s.p)}</small>
+              <small class="muted">${esc(s.e)}</small>
+            </div>
+          </div>
+          <div class="vocab-right">
+            <button class="icon-btn" data-say="${esc(s.h)}" aria-label="Play sentence">▶</button>
+          </div>
+        </div>`).join("")}</div>` : ""}`;
   }
 
   if (i === 3) {
@@ -278,8 +293,19 @@ function renderBlock() {
   }
 
   if (i === 4) {
-    html += `<h2>Your turn to speak.</h2>
-      <p class="instruction">Say each word out loud. The microphone check confirms your input is being heard; it does not grade Mandarin tones.</p>
+    html += `<h2>Your turn to produce.</h2>
+      <p class="instruction">Reading is not knowing. Type the characters for each meaning, then check yourself.</p>
+      <div class="timer-list" id="typeList">${lesson.words.map(([h, p, e], idx) => `
+        <div class="timer-row" style="align-items:center;gap:10px">
+          <span style="flex:1">${esc(e)} <small class="pinyin muted">${esc(p)}</small></span>
+          <input class="type-input" data-idx="${idx}" data-answer="${esc(h)}" placeholder="type hanzi"
+                 autocomplete="off" autocorrect="off" spellcheck="false" inputmode="text"
+                 style="max-width:120px;padding:8px;border:1px solid var(--line);border-radius:8px">
+          <span class="small" data-mark="${idx}"></span>
+        </div>`).join("")}</div>
+      <button class="secondary" id="checkTypes">Check my writing</button>
+      <div class="feedback" id="typeFeedback">Tip: switch your keyboard to Chinese if you can — but typing the pinyin without tones is also accepted.</div>
+      <div class="section-head"><h3>Speak it</h3></div>
       <div class="timer-list">${lesson.words.map(([h, p]) => `<div class="timer-row"><span>${esc(h)}</span><strong>${esc(p)}</strong></div>`).join("")}</div>
       <button class="secondary" id="recordBtn">◉ Try microphone check</button>
       <div class="feedback" id="recordFeedback">Microphone access is optional. You can also practise aloud.</div>`;
@@ -319,6 +345,34 @@ function renderBlock() {
   }
 
   if (i === 4) $("recordBtn").addEventListener("click", recordPitch);
+
+  if (i === 4) {
+    const norm = (s) => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[\s'’·]/g, "").toLowerCase();
+    $("checkTypes").addEventListener("click", () => {
+      const inputs = $("lessonContent").querySelectorAll(".type-input");
+      let right = 0;
+      inputs.forEach((inp) => {
+        const want = inp.dataset.answer;
+        const [, wantPinyin] = wordsFor(want);
+        const got = inp.value.trim();
+        const ok = got === want || (got && norm(got) === norm(wantPinyin));
+        const mark = $("lessonContent").querySelector(`[data-mark="${inp.dataset.idx}"]`);
+        if (mark) {
+          mark.textContent = ok ? "✓" : "✗ " + want;
+          mark.style.color = ok ? "var(--green)" : "var(--red)";
+        }
+        inp.style.borderColor = ok ? "var(--green)" : "var(--red)";
+        if (ok) right++;
+      });
+      const fb = $("typeFeedback");
+      fb.className = "feedback " + (right === inputs.length ? "good" : "bad");
+      fb.textContent = `${right}/${inputs.length} correct. ` + (right === inputs.length
+        ? "Written production is the hardest part — well done."
+        : "Check the ones marked red, then try again.");
+      state.skills.write = Math.min(100, state.skills.write + Math.round((right / Math.max(1, inputs.length)) * 8));
+      save();
+    });
+  }
 }
 
 /* ---------- audio ---------- */

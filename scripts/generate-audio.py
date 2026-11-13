@@ -30,6 +30,8 @@ ROOT = Path(__file__).resolve().parents[1]
 LESSONS = ROOT / "data" / "lessons.js"
 AUDIO = ROOT / "audio"
 WORD_RE = re.compile(r'\[\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*"([^"]+)"\s*\]')
+# `ex` sentences: {"h": "...", "p": "...", "e": "..."} — each needs its own clip
+SENTENCE_RE = re.compile(r'\{"h":\s*"([^"]+)"')
 
 
 def slug(text: str) -> str:
@@ -44,11 +46,16 @@ def main() -> int:
     ap.add_argument("--limit", type=int, default=0)
     args = ap.parse_args()
 
-    words = WORD_RE.findall(LESSONS.read_text(encoding="utf-8"))
+    source = LESSONS.read_text(encoding="utf-8")
+    words = WORD_RE.findall(source)
     hanzi = []
     for h, _p, _e in words:
         if h not in hanzi:
             hanzi.append(h)
+    # example sentences get clips too, so listening practice covers real speech
+    for s in SENTENCE_RE.findall(source):
+        if s not in hanzi:
+            hanzi.append(s)
     if args.limit:
         hanzi = hanzi[: args.limit]
 
