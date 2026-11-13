@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   const examElement = document.getElementById('exam');
-  if (examElement) {
+  if (examElement && !examElement.querySelector('#examTimer')) {
     const timerElement = document.createElement('div');
     timerElement.id = 'examTimer';
     timerElement.className = 'small muted';
