@@ -34,7 +34,9 @@ def main() -> int:
             hanzi.append(h)
     
     # Also extract example sentences for audio coverage
-    sentence_pattern = re.compile(r'{"h":\s*"([^"]+)"}')
+    # `ex` sentences: {"h": "...", "p": "...", "e": "..."} — match like the generator does,
+    # without requiring `"}` immediately after the hanzi (most objects carry more fields).
+    sentence_pattern = re.compile(r'\{"h":\s*"([^"]+)"')
     sentences = sentence_pattern.findall(source)
     for s in sentences:
         if s not in hanzi:
