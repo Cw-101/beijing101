@@ -51,6 +51,33 @@
     { hanzi: "想", pinyin: "xiǎng", contrast: 'j-q-x', side: 'x', audio: '60f3.mp3' },
   ];
 
+  const TONE_ITEMS = [
+    { hanzi: "妈", pinyin: "mā", tone: 1, audio: '5988.mp3' },
+    { hanzi: "吃", pinyin: "chī", tone: 1, audio: '5403.mp3' },
+    { hanzi: "书", pinyin: "shū", tone: 1, audio: '4e66.mp3' },
+    { hanzi: "七", pinyin: "qī", tone: 1, audio: '4e03.mp3' },
+    { hanzi: "一", pinyin: "yī", tone: 1, audio: '4e00.mp3' },
+    { hanzi: "分", pinyin: "fēn", tone: 1, audio: '5206.mp3' },
+    { hanzi: "麻", pinyin: "má", tone: 2, audio: '9ebb.mp3' },
+    { hanzi: "零", pinyin: "líng", tone: 2, audio: '96f6.mp3' },
+    { hanzi: "十", pinyin: "shí", tone: 2, audio: '5341.mp3' },
+    { hanzi: "谁", pinyin: "shéi", tone: 2, audio: '8c01.mp3' },
+    { hanzi: "前", pinyin: "qián", tone: 2, audio: '524d.mp3' },
+    { hanzi: "晴", pinyin: "qíng", tone: 2, audio: '6674.mp3' },
+    { hanzi: "马", pinyin: "mǎ", tone: 3, audio: '9a6c.mp3' },
+    { hanzi: "女", pinyin: "nǚ", tone: 3, audio: '5973.mp3' },
+    { hanzi: "我", pinyin: "wǒ", tone: 3, audio: '6211.mp3' },
+    { hanzi: "五", pinyin: "wǔ", tone: 3, audio: '4e94.mp3' },
+    { hanzi: "百", pinyin: "bǎi", tone: 3, audio: '767e.mp3' },
+    { hanzi: "哪", pinyin: "nǎ", tone: 3, audio: '54ea.mp3' },
+    { hanzi: "骂", pinyin: "mà", tone: 4, audio: '9a82.mp3' },
+    { hanzi: "是", pinyin: "shì", tone: 4, audio: '662f.mp3' },
+    { hanzi: "叫", pinyin: "jiào", tone: 4, audio: '53eb.mp3' },
+    { hanzi: "姓", pinyin: "xìng", tone: 4, audio: '59d3.mp3' },
+    { hanzi: "岁", pinyin: "suì", tone: 4, audio: '5c81.mp3' },
+    { hanzi: "住", pinyin: "zhù", tone: 4, audio: '4f4f.mp3' },
+  ];
+
   function itemsFor(contrastId) {
     return ITEMS.filter(function (item) { return item.contrast === contrastId; });
   }
@@ -77,5 +104,14 @@
     return !!item && item.side === side;
   }
 
-  window.EAR = { CONTRASTS, ITEMS, itemsFor, pick, check };
+  function pickTone(seed) {
+    const n = typeof seed === 'number' && Number.isFinite(seed) ? seed : 0;
+    return TONE_ITEMS[hash('tone|' + n) % TONE_ITEMS.length];
+  }
+
+  function checkTone(item, tone) {
+    return !!item && item.tone === tone;
+  }
+
+  window.EAR = { CONTRASTS, ITEMS, itemsFor, pick, check, TONE_ITEMS, pickTone, checkTone };
 })();
