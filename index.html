@@ -33,6 +33,7 @@
 </main></div></div>
 <div class="onboard" id="onboard" role="dialog" aria-modal="true" aria-labelledby="onboardTitle"><div class="modal"><div class="eyebrow">欢迎 · Welcome to Běijīng 101</div><h1 id="onboardTitle">Your Mandarin starts here.</h1><p>A focused 30-day foundation course in Standard Mandarin, with Beijing pronunciation and real-life situations.</p><div class="field"><label for="learnerName">What should we call you?</label><input id="learnerName" placeholder="Your first name" maxlength="24"></div><div class="field"><label>Have you studied Mandarin before?</label><select id="experience" class="secondary"><option value="new">I'm completely new</option><option value="some">I've tried a little</option></select></div><div class="field"><label>Daily study goal</label><input value="60 minutes · Every day" disabled aria-label="Daily study goal"></div><p class="small">30 hours is a foundation, not fluency. We'll build your listening, speaking, reading and writing step by step.</p><div class="modal-actions"><button class="primary" id="finishOnboard">Start my course →</button></div></div></div><div class="toast" id="toast"></div>
 <script src="data/lessons.js"></script>
+<script src="js/srs.js"></script>
 <script src="js/accent.js" defer></script>
 <script src="js/audiokey.js" defer></script>
 <script src="js/backupreminder.js" defer></script>
@@ -78,8 +79,37 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 const DEFAULTS = {
   name: "", day: 1, completed: [], minutes: 0, dayMinutes: 0, lastStudyDate: "",
   block: 0, cards: {}, quizDone: false, examBest: null,
-  skills: { listen: 0, speak: 0, read: 0, write: 0 }, pinyin: true, started: false,
+  skills: { listen: 0, speak: 0, read: 0, write: 0 }, pinyin: true, started: false, log: [],
 };
+
+/* Old cards stored day-granularity SM-2 fields (i/e/r/l, due as "YYYY-MM-DD").
+   Convert them once to the millisecond shape the scheduler works in. */
+function migrateCard(c) {
+  if (!c || typeof c !== "object") return SRS.newCard(Date.now());
+  if (typeof c.due === "number" && typeof c.interval === "number") {
+    return { due: c.due, interval: c.interval, ease: Number(c.ease) || 2.5,
+             reps: Number(c.reps) || 0, lapses: Number(c.lapses) || 0, last: Number(c.last) || 0 };
+  }
+  const due = typeof c.due === "string" ? Date.parse(c.due + "T00:00:00") : NaN;
+  return {
+    due: Number.isFinite(due) ? due : Date.now(),
+    interval: (Number(c.i) || 0) * SRS.DAY,
+    ease: Number(c.e) || 2.5,
+    reps: Number(c.r) || 0,
+    lapses: Number(c.l) || 0,
+    last: 0,
+  };
+}
+
+function dueLabel(card) {
+  if (!card || !card.due) return "new";
+  const now = Date.now();
+  if (card.due <= now) return "due now";
+  const left = card.due - now;
+  if (left < SRS.DAY) return `due in ${Math.max(1, Math.round(left / SRS.MINUTE))} min`;
+  const days = Math.round(left / SRS.DAY);
+  return `due in ${days} day${days === 1 ? "" : "s"}`;
+}
 
 /* ---------- state ---------- */
 
@@ -100,6 +130,8 @@ function loadState() {
       }
     });
   }
+  Object.keys(s.cards).forEach((h) => { s.cards[h] = migrateCard(s.cards[h]); });
+  s.log = Array.isArray(raw.log) ? raw.log.filter((x) => x && typeof x.h === "string").slice(-2000) : [];
   s.completed = Array.isArray(s.completed) ? s.completed.filter((n) => Number.isInteger(n) && n >= 1 && n <= 30) : [];
   s.day = Math.min(30, Math.max(1, parseInt(s.day, 10) || 1));
   s.block = Math.min(5, Math.max(0, parseInt(s.block, 10) || 0));
